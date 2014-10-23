@@ -16,47 +16,61 @@ XULSchoolChrome.BrowserOverlay = {
   sayHello : function(aEvent) {
     let stringBundle = document.getElementById("xulschoolhello-string-bundle");
     let message = stringBundle.getString("xulschoolhello.greeting.label");
-
     window.alert(content.document.URL);
-    //gBrowser.addTab("http://www.google.com/");
   }
 };
 
-// window.addEventListener("load", function () {
-//   // Add a callback to be run every time a document loads.
-//   // note that this includes frames/iframes within the document
-// 	 gBrowser.addEventListener("load", pageLoad, true);
-// }, false);
-var container = gBrowser.tabContainer,
-	oldTime=0,
-	newTime=0,
-	counterSeconds=0,
-	interval; //times in ms since epoh
+var container = gBrowser.tabContainer,	
+  interval,
+  url="http://54.191.81.102:8000/update/123"
+  //url="http://127.0.0.1/riyasaki/receive.php";
+  //url="http://cs-server.usc.edu:12211/examples/servlet/StockXML1?symbol=goog";
+let timingCounter={};
+let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+              .createInstance(Components.interfaces.nsIXMLHttpRequest);
+
+let myFile;
 
 container.addEventListener("TabOpen", tabAdded, false);
 container.addEventListener("TabSelect", tabSelected, false);
 container.addEventListener("TabClose", tabRemoved, false);
 container.addEventListener("TabAttrModified", tabAttrModified, false);
 
-let timingCounter={};
+function getLocalDirectory() {
+  let directoryService =
+    Cc["@mozilla.org/file/directory_service;1"].
+      getService(Ci.nsIProperties);
+  // this is a reference to the profile dir (ProfD) now.
+  let localDir = directoryService.get("ProfD", Ci.nsIFile);
+  localDir.append("XULSchoolNew");
+  if (!localDir.exists() || !localDir.isDirectory()) {
+    // read and write permissions to owner and group, read-only for others.
+    localDir.create(Ci.nsIFile.DIRECTORY_TYPE, 0774);
+  }
 
+  return localDir;
+  }
 function pageLoad(event) {
   if (event.originalTarget instanceof Components.interfaces.nsIDOMHTMLDocument) {
-    var win = event.originalTarget.defaultView;
+    var win = event.originalTarget.defaultView;    
     if (win.frameElement) {      
        return;
     }
     else {
-    	window.alert(content.document.URL);    	    	
-    	if(timingCounter[content.document.URL]==undefined)    	
-    		timingCounter[content.document.URL]=0;    
+      // if(timingCounter[content.document.URL]==undefined)      
+      //   timingCounter[content.document.URL]=0;    
+      myFile = getLocalDirectory();
+      myFile.append("/abc.txt");
+      //content.console.log("File created @ "+File(myFile.path));
+      content.console.log("URL added :"+content.document.URL+" value:"+timingCounter[content.document.URL]);
+
     }
   }
 }
 //---------------------------
 function tabAdded(event) {
   var browserNewTab = gBrowser.getBrowserForTab(event.target);
-  // browser is the XUL element of the browser that's been added  
+  content.console.log("New tab added");  
   browserNewTab.addEventListener("load", pageLoad, true);
 }
 function tabSelected(event) {
@@ -64,29 +78,55 @@ function tabSelected(event) {
   //alert(browser.currentURI.spec+" Tab selected");
 }
 function tabRemoved(event) {
-  var browserTabRemoved = gBrowser.getBrowserForTab(event.target);
-  // browser is the XUL element of the browser that's been removed
-  //newTime=(new Date()).getTime()
-  timingCounter[content.document.URL]=counterSeconds;
+  var browserTabRemoved = gBrowser.getBrowserForTab(event.target);  
   alert("The tab :"+content.document.URL+" was opened for "+timingCounter[content.document.URL]);
+  //send data to server after the tab is closed...
 
+  request.open("POST", url, true);        
+  request.onreadystatechange = fetch;
+  request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");        
+  request.send("u="+content.document.URL+"&t="+timingCounter[content.document.URL]+"&ti="+content.document.title);
+
+  content.console.log("Deleted from obj : "+content.document.URL);
+  delete timingCounter[content.document.URL];
 }
 function tabAttrModified(event) {
-  var tab = event.target;
-
-  // Now you can check what's changed on the tab
+  var tab = event.target; 
   content.console.log(tab.selected);
-  //oldTime=(new Date()).getTime();
-  if(tab.selected) {    	
+  if(timingCounter[content.document.URL]==undefined)      
+        timingCounter[content.document.URL]=0;
+  if(tab.selected && content.document.URL!="about:blank" && content.document.URL!="about:addons" && content.document.URL!="about:newtab") {    	
   	clearInterval(interval);
-  	content.console.log("Resumed/started at : "+counterSeconds+" URL:"+content.document.URL);
+  	content.console.log("Resumed/started at : "+timingCounter[content.document.URL]+" URL:"+content.document.URL);
   	interval=setInterval(function(){
-  		counterSeconds++;
-  		content.console.log(counterSeconds+" URL:"+content.document.URL)
+  		timingCounter[content.document.URL]++;
+  		content.console.log("Inside tabAttrModified "+timingCounter[content.document.URL]+" URL:"+content.document.URL);
+  		if(timingCounter[content.document.URL]%20==0) {        
+  		  content.console.log("--------------Logging start-----------------");
+        // request.open("POST", url, true);        
+        // request.onreadystatechange = fetch;
+        // request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");        
+        // request.send("u="+content.document.URL+"&t="+timingCounter[content.document.URL]);
+        //request.send(null);
+  			for(var propertyName in timingCounter) {			   
+			   content.console.log(timingCounter[propertyName]+" URL:"+propertyName);
+			}
+			  content.console.log("--------------Logging End-----------------");        
+  		}
   	},1000);
   }
   else {
   	clearInterval(interval);
-  	content.console.log("Stopped at : "+counterSeconds+" URL:"+content.document.URL);
+  	content.console.log("Stopped at : "+timingCounter[content.document.URL]+" URL:"+content.document.URL);
+  }
+}
+function fetch() {
+  if(request.status==200 && request.readyState==4) {
+    try {
+      //content.console.log("Received Data:"+JSON.stringify(JSON.parse(request.responseText)));
+      content.console.log("Received Data:"+(request.responseText));
+    }
+    catch (e) {
+    }
   }
 }
