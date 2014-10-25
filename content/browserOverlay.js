@@ -27,13 +27,16 @@ var container = gBrowser.tabContainer,
   randomIDNum,
   prefs = Components.classes["@mozilla.org/preferences-service;1"]
                     .getService(Components.interfaces.nsIPrefService),
-  cookieUri = Components.classes["@mozilla.org/network/io-service;1"]
-    .getService(Components.interfaces.nsIIOService)
-    .newURI(url, null, null),
-  cookieString,
-  ourDomain="http://54.191.81.102:8001";  
-  prefs = prefs.getBranch("extensions.xulschoolhello1.");
+  prefs = prefs.getBranch("extensions.xulschoolhello1."),
+  cookieManager = Components.classes["@mozilla.org/cookiemanager;1"]
+                  .getService(Components.interfaces.nsICookieManager2),
+  count;
   //url="http://cs-server.usc.edu:12211/examples/servlet/StockXML1?symbol=goog";
+  // cookieUri = Components.classes["@mozilla.org/network/io-service;1"]
+  //   .getService(Components.interfaces.nsIIOService)
+  //   .newURI(url, null, null),
+  // cookieString,
+  // ourDomain="http://54.191.81.102:8001",
 let timingCounter={};
 let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
               .createInstance(Components.interfaces.nsIXMLHttpRequest); 
@@ -61,7 +64,7 @@ let listener = {
 }
 try {
   Components.utils.import("resource://gre/modules/AddonManager.jsm");
-  AddonManager.addAddonListener(listener);
+  AddonManager.addAddonListener(listener);  
 } catch (ex) {
   alert("exception");
 }
@@ -82,13 +85,41 @@ function pageLoad(event) {
         randomIDNum=prefs.getIntPref("xyz");
         alert("Pref DID existed:"+randomIDNum);
       }
-      cookieString="uniqueID="+randomIDNum.toString()+";domain="+ourDomain+";path=/";
-      Components.classes["@mozilla.org/cookieService;1"]
-                .getService(Components.interfaces.nsICookieService)
-                .setCookieString(cookieUri, null, cookieString, null);
-      alert("Cookie set to"+cookieString);
       url+=randomIDNum.toString();
       url+="/";      
+      // cookieString="uniqueID="+randomIDNum.toString()+";domain="+ourDomain+";path=/";
+      // Components.classes["@mozilla.org/cookieService;1"]
+      //           .getService(Components.interfaces.nsICookieService)
+      //           .setCookieString(cookieUri, null, cookieString, null);
+      //alert("Cookie set to"+cookieString);
+      // Components.classes["@mozilla.org/cookiemanager;1"].getService(Components.interfaces.nsICookieManager2).add(encodeURI("monil.com"),encodeURI("/"),"x1","y",false,false,true,3600);
+      // Components.classes["@mozilla.org/cookiemanager;1"].getService(Components.interfaces.nsICookieManager2).add(encodeURI("monil.com"),encodeURI("/"),"a1","b",false,false,true,3600);
+      //second cookie way      
+      //alert(count.length);
+      //alert(cookieManager.countCookiesFromHost("facebook.com"));
+      //alert(cookieManager.countCookiesFromHost("bing.com"));      
+      var domainn = "54.191.81.102"
+      var pathn = "/";
+      var cookienamen="randomID";
+      var cookievaluen=randomIDNum.toString();
+      var cookieexpiren=2147385600;
+      try {
+        var obj = Components.classes["@mozilla.org/cookiemanager;1"].
+            getService(Components.interfaces.nsICookieManager2);
+        obj.add (domainn, pathn, cookienamen, cookievaluen, false, false,false, cookieexpiren);
+      } 
+      catch(e) {
+          content.console.log("setCookie error:" + e);
+        }
+      count= cookieManager.getCookiesFromHost("54.191.81.102");
+      while (count.hasMoreElements()){
+        var cookie = count.getNext();       
+        if (cookie instanceof Ci.nsICookie){ //Components.interfaces
+            content.console.log(cookie.host);
+            content.console.log(cookie.name);
+            content.console.log(cookie.value);
+        }
+      } //check cookie from domain working well            
     }
   }
 }
