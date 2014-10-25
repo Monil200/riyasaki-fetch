@@ -1,5 +1,7 @@
 content   xulschoolhello                content/
 skin      xulschoolhello  classic/1.0   skin/
+skin      xulschoolhello  classic/1.0 skin/mac/ os=Darwin
+skin      xulschoolhello  classic/1.0 skin/win/ os=WinNT
 locale    xulschoolhello  en-US         locale/en-US/
 
 overlay chrome://browser/content/browser.xul  chrome://xulschoolhello/content/browserOverlay.xul

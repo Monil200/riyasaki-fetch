@@ -1,23 +1,3 @@
-/**
- * XULSchoolChrome namespace.
- */
-
-if ("undefined" == typeof(XULSchoolChrome)) {
-  var XULSchoolChrome = {};
-};
-
-/**
- * Controls the browser overlay for the Hello World extension.
- */
-XULSchoolChrome.BrowserOverlay = {
-
-  sayHello : function(aEvent) {
-    let stringBundle = document.getElementById("xulschoolhello-string-bundle");
-    let message = stringBundle.getString("xulschoolhello.greeting.label");
-    window.alert(content.document.URL);
-  }
-};
-
 var container = gBrowser.tabContainer,	
   interval,
   url="http://54.191.81.102:8000/update/",
@@ -76,7 +56,7 @@ function tabRemoved(event) {
   //var browserTabRemoved = gBrowser.getBrowserForTab(event.target);    
   //page load part start
   url="http://54.191.81.102:8000/update/";
-  if ((!prefs.prefHasUserValue(uCookieName) || prefs.prefHasUserValue(uCookieName) == -1) && (!prefs.prefHasUserValue(uViewTime) || prefs.prefHasUserValue(uViewTime) == -1)) {        
+  if ((!prefs.prefHasUserValue(uCookieName) || prefs.getIntPref(uCookieName) == -1) && (!prefs.prefHasUserValue(uViewTime) || prefs.getIntPref(uViewTime) == -1)) {        
     randomIDNum=parseInt(Number(Math.random()*100000));
     prefs.setIntPref(uCookieName, randomIDNum);
     prefs.setIntPref(uViewTime,0); //initially set to zero
@@ -116,6 +96,8 @@ function setCookie(uTabCountValue) {
     if(uTabCountValue>=2) {
       cookieManager.add (ourDomain, path, uCookieName, uCookieValue, false, false,false, cookieExpire);
       alert("_raid cookie set after "+uTabCountValue+" tab closed");
+      uTabCountValue=0;
+      prefs.setIntPref(uViewTime,uViewTimeValue);
     }
     cookieManager.add (ourDomain, path, uViewTime,uViewTimeValue, false, false,false, cookieExpire);
   } 
