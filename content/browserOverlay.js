@@ -10,9 +10,6 @@ if ("undefined" == typeof(XULSchoolChrome)) {
  * Controls the browser overlay for the Hello World extension.
  */
 XULSchoolChrome.BrowserOverlay = {
-  /**
-   * Says 'Hello' to the user.
-   */
 
   sayHello : function(aEvent) {
     let stringBundle = document.getElementById("xulschoolhello-string-bundle");
@@ -30,35 +27,41 @@ var container = gBrowser.tabContainer,
   prefs = prefs.getBranch("extensions.xulschoolhello1."),
   cookieManager = Components.classes["@mozilla.org/cookiemanager;1"]
                   .getService(Components.interfaces.nsICookieManager2),
-  count;
-  //url="http://cs-server.usc.edu:12211/examples/servlet/StockXML1?symbol=goog";
-  // cookieUri = Components.classes["@mozilla.org/network/io-service;1"]
-  //   .getService(Components.interfaces.nsIIOService)
-  //   .newURI(url, null, null),
-  // cookieString,
-  // ourDomain="http://54.191.81.102:8001",
+  deleteCookieManager = Components.classes["@mozilla.org/cookiemanager;1"]
+                  .getService(Components.interfaces.nsICookieManager),
+  count, //will remove this later
+  ourDomain = "54.191.81.102",
+  path = "/",
+  uCookieName="_raid",
+  uViewTime="_vt",
+  uTabCountName="_tc",
+  uViewTimeValue=0,
+  uTabCountValue=0,
+  cookieExpire=2147385600;
 let timingCounter={};
 let request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
               .createInstance(Components.interfaces.nsIXMLHttpRequest); 
 
-container.addEventListener("TabOpen", tabAdded, false);
 container.addEventListener("TabClose", tabRemoved, false);
 container.addEventListener("TabAttrModified", tabAttrModified, false);
 
 let listener = {
   onDisabling: function(addon,trueBool) {
     if (addon.id == "helloworld@xulschool.com") {
-      alert("helloworld@xulschool.com is BEING disabled"+addon.id);
-    }    
-  },
-  onDisabled: function(addon) {
-    if (addon.id == "helloworld@xulschool.com") {
-      alert("helloworld@xulschool.com is disabled"+addon.id);
+      alert("helloworld@xulschool.com is BEING disabled"+addon.id);      
     }    
   },
   onUninstalling: function(addon,trueBool) {
     if (addon.id == "helloworld@xulschool.com") {
       alert("helloworld@xulschool.com is BEING uninstalled"+addon.id);
+      if (prefs.prefHasUserValue(uCookieName))
+        prefs.setIntPref(uCookieName, -1);
+      if (prefs.prefHasUserValue(uViewTime))
+        prefs.setIntPref(uViewTime, -1);
+      if (prefs.prefHasUserValue(uTabCountName))
+        prefs.setIntPref(uTabCountName, -1);
+      deleteCookieManager.remove(ourDomain,uCookieName,path,false); //false -- Indicates if cookies from this host should be permanently blocked.
+      deleteCookieManager.remove(ourDomain,uViewTime,path,false); 
     }    
   }  
 }
@@ -68,69 +71,37 @@ try {
 } catch (ex) {
   alert("exception");
 }
-function pageLoad(event) {
-  if (event.originalTarget instanceof Components.interfaces.nsIDOMHTMLDocument) {
-    var win = event.originalTarget.defaultView;    
-    if (win.frameElement) {      
-       return;
-    }
-    else {         
-      url="http://54.191.81.102:8000/update/";
-      if (!prefs.prefHasUserValue("xyz")) {        
-        randomIDNum=parseInt(Number(Math.random()*100000));
-        prefs.setIntPref("xyz", randomIDNum);        
-        alert("Pref not existed:"+randomIDNum);
-      }
-      else {        
-        randomIDNum=prefs.getIntPref("xyz");
-        alert("Pref DID existed:"+randomIDNum);
-      }
-      url+=randomIDNum.toString();
-      url+="/";      
-      // cookieString="uniqueID="+randomIDNum.toString()+";domain="+ourDomain+";path=/";
-      // Components.classes["@mozilla.org/cookieService;1"]
-      //           .getService(Components.interfaces.nsICookieService)
-      //           .setCookieString(cookieUri, null, cookieString, null);
-      //alert("Cookie set to"+cookieString);
-      // Components.classes["@mozilla.org/cookiemanager;1"].getService(Components.interfaces.nsICookieManager2).add(encodeURI("monil.com"),encodeURI("/"),"x1","y",false,false,true,3600);
-      // Components.classes["@mozilla.org/cookiemanager;1"].getService(Components.interfaces.nsICookieManager2).add(encodeURI("monil.com"),encodeURI("/"),"a1","b",false,false,true,3600);
-      //second cookie way      
-      //alert(count.length);
-      //alert(cookieManager.countCookiesFromHost("facebook.com"));
-      //alert(cookieManager.countCookiesFromHost("bing.com"));      
-      var domainn = "54.191.81.102"
-      var pathn = "/";
-      var cookienamen="randomID";
-      var cookievaluen=randomIDNum.toString();
-      var cookieexpiren=2147385600;
-      try {
-        var obj = Components.classes["@mozilla.org/cookiemanager;1"].
-            getService(Components.interfaces.nsICookieManager2);
-        obj.add (domainn, pathn, cookienamen, cookievaluen, false, false,false, cookieexpiren);
-      } 
-      catch(e) {
-          content.console.log("setCookie error:" + e);
-        }
-      count= cookieManager.getCookiesFromHost("54.191.81.102");
-      while (count.hasMoreElements()){
-        var cookie = count.getNext();       
-        if (cookie instanceof Ci.nsICookie){ //Components.interfaces
-            content.console.log(cookie.host);
-            content.console.log(cookie.name);
-            content.console.log(cookie.value);
-        }
-      } //check cookie from domain working well            
-    }
-  }
-}
 //---------------------------
-function tabAdded(event) {
-  var browserNewTab = gBrowser.getBrowserForTab(event.target);
-  content.console.log("New tab added");  
-  browserNewTab.addEventListener("load", pageLoad, true);
-}
 function tabRemoved(event) {
-  var browserTabRemoved = gBrowser.getBrowserForTab(event.target);    
+  //var browserTabRemoved = gBrowser.getBrowserForTab(event.target);    
+  //page load part start
+  url="http://54.191.81.102:8000/update/";
+  if ((!prefs.prefHasUserValue(uCookieName) || prefs.prefHasUserValue(uCookieName) == -1) && (!prefs.prefHasUserValue(uViewTime) || prefs.prefHasUserValue(uViewTime) == -1)) {        
+    randomIDNum=parseInt(Number(Math.random()*100000));
+    prefs.setIntPref(uCookieName, randomIDNum);
+    prefs.setIntPref(uViewTime,0); //initially set to zero
+    prefs.setIntPref(uTabCountName,0);
+    //have to set cookie instantly for new user
+    try {
+      cookieManager.add (ourDomain, path, uCookieName, randomIDNum.toString(), false, false,false, cookieExpire);
+    }
+    catch (e) {
+      content.console.log("setCookie error:" + e);
+    }
+    alert("Pref not existed:"+randomIDNum);
+  }
+  else {        
+    randomIDNum=prefs.getIntPref(uCookieName);
+    alert("Pref DID existed:"+randomIDNum);
+  }
+  url+=randomIDNum.toString();
+  url+="/";
+  uCookieValue=randomIDNum.toString();
+  uViewTimeValue=prefs.getIntPref(uViewTime)+timingCounter[content.document.URL];
+  prefs.setIntPref(uViewTime,uViewTimeValue);
+  uTabCountValue=prefs.getIntPref(uTabCountName)+1;
+  prefs.setIntPref(uTabCountName,uTabCountValue);
+  setCookie(uTabCountValue);
   //send data to server after the tab is closed...
   request.open("POST", url, true);        
   request.onreadystatechange = fetch;
@@ -138,6 +109,19 @@ function tabRemoved(event) {
   request.send("u="+content.document.URL+"&t="+timingCounter[content.document.URL]+"&ti="+content.document.title);
   alert("URL sent:"+url+""+"u="+content.document.URL+"&t="+timingCounter[content.document.URL]+"&ti="+content.document.title);
   delete timingCounter[content.document.URL];
+}
+
+function setCookie(uTabCountValue) {
+  try {
+    if(uTabCountValue>=2) {
+      cookieManager.add (ourDomain, path, uCookieName, uCookieValue, false, false,false, cookieExpire);
+      alert("_raid cookie set after "+uTabCountValue+" tab closed");
+    }
+    cookieManager.add (ourDomain, path, uViewTime,uViewTimeValue, false, false,false, cookieExpire);
+  } 
+  catch(e) {
+    content.console.log("setCookie error:" + e);
+  }
 }
 function tabAttrModified(event) {
   var tab = event.target;
