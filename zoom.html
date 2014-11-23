@@ -1,0 +1,285 @@
+<html>
+<head>
+	<title>
+		ZOOM
+	</title>
+	<style>
+	.content {
+	  	margin-left: 333px;
+	  	margin-top: 70px;
+	  	top: 0;
+	  	right: 0;
+	  	bottom: 0;
+	  	left: 0;
+	  	width: 700px;
+		height: 375px;
+		/*border:1px solid black;*/
+		background: -webkit-linear-gradient(#8A5C2E,#eee8d5); /* For Safari 5.1 to 6.0 */
+		background: -o-linear-gradient(#8A5C2E,#eee8d5); /* For Opera 11.1 to 12.0 */
+		background: -moz-linear-gradient(#5C8A8A,#DEE8E8,#D6ADAD); /* For Firefox 3.6 to 15 */
+		background: linear-gradient(#5C8A8A,#DEE8E8,#D6ADAD);
+		box-shadow: 11px 0 9px -12px #888;
+		z-index: 9;
+	}
+	.container{
+		height:100%;
+		width:100%;
+		opacity: 0.2;
+	}
+	.nextButton,.backButton {
+		font-weight: bold;
+		background-color: #3c80f6;
+		border: 1px solid #b8b8b8;
+		border-radius: 3px;
+		box-shadow: 0 1px 0 rgba(0,0,0,.05);
+		font-weight: bold;
+		color:white;
+		text-align: center;
+		height: 30px;
+		width: 65px;
+		margin-top: 20px;
+		right: 25px;
+		cursor:pointer;
+	}
+	.backButton{
+		left:25px;
+		z-index: 12;
+	}
+	.progress {
+		width: 700px;
+	  	height:5px;
+	  	margin-left: 325px;
+	  	margin-top: -156px;
+	  	z-index: 12;
+	  	box-shadow: 11px 0 9px -12px #888;
+	}
+	.navOne,.navTwo,.navThree,.navFour{
+		width: 24.85%;
+		height:5px;
+		float: left;
+		border-right: 0.5px solid #eee8d5;
+		-webkit-transition: background-color 0.5s ease-in;
+		transition: background-color 1s ease-in;
+		z-index: 12;
+		background-color: white;
+	}
+	.bottom{
+		height:78px;
+		width:698px;
+		border: 0.5px solid #eee8d5;
+		margin-top: -152px;
+		margin-left: 325px;
+		z-index: 12;
+		background-color: white;
+		box-shadow: 11px 11px 9px -12px #888;
+	}
+	.imgContainer{
+		height:304px;
+		width:596px;
+		margin-top: -73px;
+		margin-left: 375px;	
+		z-index: 11;
+		background-color: white;		
+	}
+	.actualImg{
+		height:304px;
+		width:596px;
+		margin-top: -73px;
+		margin-left: 375px;	
+		z-index: 10;
+	}
+	.cross{
+		background-image: url('sprite.png');
+		width: 20px;
+		height: 20px;
+		cursor: cursor;
+		background-position: -641px 2px;		
+		margin-left: 668px;
+		margin-top: 2px;
+		background-repeat: no-repeat;
+		background-color: transparent;
+		border: 0;
+		outline: 0;
+		z-index: 50;
+		cursor:pointer;
+	}
+	.matter{
+	  	margin-top: 25px;
+	  	top: 0;
+	  	right: 0;
+	  	bottom: 0;
+	  	left: 0;
+	  	width: 700px;
+		height: 350px;		
+		z-index: 9;
+	}
+	.p-a{
+		position: absolute;
+	}
+	.p-r{
+		position: relative;
+	}
+	.disabled{
+		display:none;
+	}
+	.enabled{
+		display:inherit;
+	}
+	</style>
+</head>
+
+<body>
+		<div class="container">
+		hi this is body....
+		</div>
+		<div class="content p-a enabled" id="screenOne">
+			<div class="closeContainer">
+				<button type="button" class="cross p-r">&nbsp;</button>
+			</div>
+			<div class="matter p-a">
+			</div>
+		</div>		
+		 <div class="progress p-a">
+			<div class="navOne"></div>
+			<div class="navTwo"></div>
+			<div class="navThree"></div>
+			<div class="navFour"></div>
+		</div>
+		<!-- <img src="mcperfect.jpg" class="mainImg"> -->
+		<div class="bottom p-a">
+				<button class="nextButton p-a">Next</button>
+				<button class="backButton p-a">Back</button>
+		</div>
+		<div class="imgContainer p-a">			
+		</div>	
+		<div class="actualImg p-a">
+				<img src="riyusaki.png" style="height:350px;width:650px;">
+		</div>
+		<!-- screen2 content start -->
+		<div class="content p-a disabled" id="screenTwo">
+			<div class="closeContainer">
+				<button type="button" class="cross p-r">&nbsp;</button>
+			</div>
+			<div class="matter p-a">
+				<!-- matter for screen 2 -->
+			</div>
+			<h2>Screen 2</h2>
+		</div>
+		<!-- screen2 content end -->
+		<!-- screen3 content start -->
+		<div class="content p-a disabled" id="screenThree">
+			<div class="closeContainer">
+				<button type="button" class="cross p-r">&nbsp;</button>
+			</div>
+			<div class="matter p-a">
+				<!-- matter for screen 3 -->
+			</div>
+			<h2>Screen 3</h2>
+		</div>
+		<!-- screen3 content end -->
+		<!-- screen4 content start -->
+		<div class="content p-a disabled" id="screenFour">
+			<div class="closeContainer">
+				<button type="button" class="cross p-r">&nbsp;</button>
+			</div>
+			<div class="matter p-a">
+				<!-- matter for screen 4 -->
+			</div>
+			<h2>Screen 4</h2>
+		</div>
+		<!-- screen4 content end -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			var count=1;
+			if(count==1) {
+					$(".actualImg").animate({marginTop:'-484px'},1200);
+					$(".navOne").css({ backgroundColor: '#3c80f6' }); 
+					$(".backButton").css({cursor:"not-allowed",opacity:"0.2"});					
+					$(".backButton").attr("enabled",false);
+			}			
+			$(".nextButton").click(function(){				
+				count++;				
+				if(count==2) {					
+					$(".navTwo").css({ backgroundColor: '#3c80f6' });
+					$(".actualImg").css({visibility:"hidden"},500);
+					$("#screenOne").removeClass("enabled");
+					$("#screenOne").addClass("disabled");
+					$("#screenTwo").addClass("enabled");
+					//change button
+					$(".backButton").css({cursor:"pointer",opacity:"1"});					
+					$(".backButton").attr("enabled",true);
+				}
+				else if(count==3) {
+					$(".navThree").css({ backgroundColor: '#3c80f6' }); 
+					$("#screenTwo").removeClass("enabled");
+					$("#screenTwo").addClass("disabled");
+					$("#screenThree").addClass("enabled");
+					
+				}
+				else if(count==4) {
+					$(".navFour").css({ backgroundColor: '#3c80f6' });
+					$("#screenThree").removeClass("enabled");
+					$("#screenThree").addClass("disabled");
+					$("#screenFour").addClass("enabled");
+					$(".nextButton").text("Close");
+				}
+				else if(count>4) {
+					clearAll();
+				}
+			});
+			$(".backButton").click(function(){
+				count--;				
+				if(count>=3) {					
+					$(".navFour").css({ backgroundColor: '#FFFFFF' });
+					$(".actualImg").css({visibility:"hidden"},500);
+					$("#screenFour").removeClass("enabled");
+					$("#screenFour").addClass("disabled");
+					$("#screenThree").addClass("enabled");
+					$(".nextButton").text("Next");
+					count=3;
+					//change button					
+				}
+				else if(count==2) {
+					$(".navThree").css({ backgroundColor: '#FFFFFF' }); 
+					$("#screenThree").removeClass("enabled");
+					$("#screenThree").addClass("disabled");
+					$("#screenTwo").addClass("enabled");
+					
+				}
+				else if(count==1) {
+					$(".navTwo").css({ backgroundColor: '#FFFFFF' });
+					$("#screenTwo").removeClass("enabled");
+					$("#screenTwo").addClass("disabled");
+					$("#screenOne").addClass("enabled");
+					$(".actualImg").css({visibility:"visibility"},0);
+					$(".backButton").css({cursor:"not-allowed",opacity:"0.2"});					
+					$(".backButton").attr("enabled",false); 
+				}
+			});
+			$(".cross").click(function(){
+				clearAll();
+			});
+			$(document).keyup(function(e) {
+  			if (e.keyCode == 27) { 
+  					clearAll();
+  			 	}
+			});
+			if(navigator.userAgent.indexOf("Chrome")>-1) {
+				$(".navOne,.navTwo,.navThree,.navFour").css({width:"25%"});
+				$(".bottom").css({border:"1px solid #eee8d5"});
+				$(".content").css({marginTop:"104px"});
+			}
+		});
+	function clearAll(){
+		//$(".content,.progress,.bottom,.imgContainer,.actualImg").css({display:"none"});
+		$(".content,.progress,.bottom,.imgContainer,.actualImg").animate({opacity:"0"},400);
+		setTimeout(function(){
+			$(".content,.progress,.bottom,.imgContainer,.actualImg").css({display:"none"});
+			$(".container").css({opacity:"1"});
+			$(".bottom").css({border:"0"});
+		},400);				
+	}
+	</script>
+</body>
+</html>
